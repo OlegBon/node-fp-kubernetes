@@ -14,9 +14,6 @@ build:
   image: docker:latest
   before_script:
     - apk update && apk add --no-cache docker-compose
-    - echo "Authenticating with GitLab"
-    - git config --global user.name "${GITLAB_USER}"
-    - git config --global user.password "${GITLAB_TOKEN}"
   script:
     - docker-compose build
 
@@ -25,9 +22,6 @@ deploy:
   image: docker:latest
   before_script:
     - apk update && apk add --no-cache docker-compose
-    - echo "Authenticating with GitLab"
-    - git config --global user.name "${GITLAB_USER}"
-    - git config --global user.password "${GITLAB_TOKEN}"
   script:
     - docker-compose up -d
 
