@@ -22,7 +22,7 @@ db.connect((err) => {
 // Маршрути
 app.get('/', (req, res) => res.send('Hello World!'));
 app.get('/api', (req, res) => {
-  db.query('SELECT * FROM some_table', (err, results) => {
+  db.query('SELECT * FROM users', (err, results) => {
     if (err) {
       res.status(500).send(err);
     } else {
