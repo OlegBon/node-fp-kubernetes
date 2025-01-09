@@ -1,71 +1,34 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const mysql = require('mysql2');
-const session = require('cookie-session');
-
 const app = express();
 const port = 5000;
 
-app.use(bodyParser.json());
-app.use(session({
-	name: 'session',
-	keys: ['key1', 'key2'],
-	maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}));
-
-// Database connection
+// Налаштування підключення до бази даних
 const db = mysql.createConnection({
-	host: 'database',
-	user: 'root',
-	password: 'rootpassword',
-	database: 'myapp'
+  host: 'database',
+  user: 'root',
+  password: 'rootpassword',
+  database: 'myapp'
 });
 
-// Register route
-app.post('/register', (req, res) => {
-	const { name, email, password } = req.body;
-	db.query('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [name, email, password], (err, results) => {
-    	if (err) throw err;
-    	res.send('User registered');
-	});
+db.connect((err) => {
+  if (err) {
+    console.error('Error connecting to database:', err);
+    return;
+  }
+  console.log('Connected to database');
 });
 
-// Login route
-app.post('/login', (req, res) => {
-	const { email, password } = req.body;
-	db.query('SELECT * FROM users WHERE email = ? AND password = ?', [email, password], (err, results) => {
-    	if (err) throw err;
-    	if (results.length > 0) {
-        	req.session.user = results[0];
-        	res.send('Login successful');
-    	} else {
-        	res.send('Invalid credentials');
-    	}
-	});
+// Маршрути
+app.get('/', (req, res) => res.send('Hello World!'));
+app.get('/api', (req, res) => {
+  db.query('SELECT * FROM some_table', (err, results) => {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+      res.json(results);
+    }
+  });
 });
 
-// Users route
-app.get('/users', (req, res) => {
-	if (!req.session.user) {
-    	return res.status(401).send('Not authorized');
-	}
-	db.query('SELECT * FROM users', (err, results) => {
-    	if (err) throw err;
-    	res.json(results);
-	});
-});
-
-// Logout route
-app.post('/logout', (req, res) => {
-	req.session = null;
-	res.send('Logged out');
-});
-
-// Error route
-app.use((req, res) => {
-	res.status(404).send('Page not found');
-});
-
-app.listen(port, () => {
-	console.log(`Backend running on port ${port}`);
-});
+app.listen(port, () => console.log(`Backend running on port ${port}`));
