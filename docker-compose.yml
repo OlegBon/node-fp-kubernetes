@@ -1,11 +1,10 @@
-yaml
 version: '3.8'
 
 services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: ../docker/frontend/Dockerfile
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     depends_on:
@@ -14,7 +13,7 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: ../docker/backend/Dockerfile
+      dockerfile: Dockerfile
     ports:
       - "5000:5000"
     depends_on:
@@ -26,9 +25,7 @@ services:
       DATABASE_NAME: myapp
 
   database:
-    build:
-      context: ./database
-      dockerfile: ../docker/database/Dockerfile
+    image: mysql:5.7
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: myapp
