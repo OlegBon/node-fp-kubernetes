@@ -1,4 +1,3 @@
-# backend/Dockerfile
 FROM node:14
 
 WORKDIR /app
@@ -10,4 +9,4 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["node", "index.js"]
+CMD ["./wait-for-it.sh", "database:3306", "--", "node", "index.js"]
