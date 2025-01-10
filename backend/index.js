@@ -37,9 +37,16 @@ db.connect((err) => {
 // Маршрут для реєстрації
 app.post('/register', (req, res) => {
     const { name, email, password } = req.body;
-    db.query('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [name, email, password], (err, results) => {
+    db.query('SELECT * FROM users WHERE email = ? OR name = ?', [email, name], (err, results) => {
         if (err) throw err;
-        res.send('User registered');
+        if (results.length > 0) {
+            res.send('User already exists');
+        } else {
+            db.query('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [name, email, password], (err, results) => {
+                if (err) throw err;
+                res.send('User registered');
+            });
+        }
     });
 });
 
@@ -65,6 +72,17 @@ app.get('/users', (req, res) => {
     db.query('SELECT * FROM users', (err, results) => {
         if (err) throw err;
         res.json(results);
+    });
+});
+
+// Маршрут для очищення бази даних
+app.post('/clear', (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).send('Not authorized');
+    }
+    db.query('DELETE FROM users', (err, results) => {
+        if (err) throw err;
+        res.send('Database cleared');
     });
 });
 
