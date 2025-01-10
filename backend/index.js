@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
-const session = require('cookie-session');
+const session = require('express-session');
 const cors = require('cors');
 
 const app = express();
@@ -9,13 +9,14 @@ const port = 5000;
 
 app.use(bodyParser.json());
 app.use(cors({
-    origin: 'http://localhost:3000', // URL фронтенду
+    origin: 'http://localhost:3000', // URL вашого фронтенду
     credentials: true
 }));
 app.use(session({
-    name: 'session',
-    keys: ['key1', 'key2'],
-    maxAge: 24 * 60 * 60 * 1000 // 24 години
+    secret: 'my_secret_key',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false, httpOnly: true, maxAge: 24 * 60 * 60 * 1000 } // 24 години
 }));
 
 // Підключення до бази даних
@@ -44,6 +45,7 @@ app.post('/register', (req, res) => {
         } else {
             db.query('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [name, email, password], (err, results) => {
                 if (err) throw err;
+                req.session.user = { name, email }; // Зберігаємо користувача в сесії
                 res.send('User registered');
             });
         }
@@ -56,7 +58,7 @@ app.post('/login', (req, res) => {
     db.query('SELECT * FROM users WHERE email = ? AND password = ?', [email, password], (err, results) => {
         if (err) throw err;
         if (results.length > 0) {
-            req.session.user = results[0];
+            req.session.user = results[0]; // Зберігаємо користувача в сесії
             res.send('Login successful');
         } else {
             res.send('Invalid credentials');
@@ -91,8 +93,12 @@ app.post('/logout', (req, res) => {
     if (!req.session.user) {
         return res.status(401).send('Not authorized. Please log in.');
     }
-    req.session = null;
-    res.send('Logged out');
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).send('Error logging out');
+        }
+        res.send('Logged out');
+    });
 });
 
 // Маршрут для помилок
