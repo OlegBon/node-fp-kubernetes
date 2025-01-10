@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
 const Users = () => {
     const [users, setUsers] = useState([]);
     const [message, setMessage] = useState('');
-    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -22,7 +20,7 @@ const Users = () => {
         };
 
         fetchUsers();
-    }, [navigate]);
+    }, []);
 
     const handleClear = async () => {
         try {
