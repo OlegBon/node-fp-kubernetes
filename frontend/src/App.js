@@ -6,8 +6,6 @@ import Users from './pages/Users';
 import Logout from './pages/Logout';
 
 const App = () => {
-  const isAuthenticated = !!document.cookie; // Перевірка наявності кукі
-
   return (
     <Router>
       <Routes>
