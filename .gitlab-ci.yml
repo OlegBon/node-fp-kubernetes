@@ -1,5 +1,6 @@
 stages:
   - build
+  - test
   - deploy
 
 variables:
@@ -17,6 +18,15 @@ build:
   script:
     - docker-compose build
 
+test:
+  stage: test
+  image: node:14
+  before_script:
+    - cd frontend
+    - npm install
+  script:
+    - npm test
+
 deploy:
   stage: deploy
   image: docker:latest
@@ -24,4 +34,5 @@ deploy:
     - apk update && apk add --no-cache docker-compose
   script:
     - docker-compose up -d
-
+  only:
+    - master
