@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
 const Users = () => {
     const [users, setUsers] = useState([]);
-    const navigate = useNavigate();
+    const [message, setMessage] = useState('');
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -13,7 +12,7 @@ const Users = () => {
                 setUsers(response.data);
             } catch (error) {
                 if (error.response && error.response.status === 401) {
-                    navigate('/'); // Редірект на головну сторінку якщо неавторизований
+                    setMessage('Not authorized. Please log in.');
                 } else {
                     console.error('There was an error fetching the users!', error);
                 }
@@ -21,7 +20,7 @@ const Users = () => {
         };
 
         fetchUsers();
-    }, [navigate]);
+    }, []);
 
     const handleClear = async () => {
         try {
@@ -36,6 +35,7 @@ const Users = () => {
     return (
         <div>
             <h1>Users</h1>
+            {message && <p>{message}</p>}
             <button onClick={handleClear}>Clear Database</button>
             <ul>
                 {users.map(user => (

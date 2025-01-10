@@ -1,27 +1,27 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
 const Logout = () => {
-    const navigate = useNavigate();
+    const [message, setMessage] = useState('');
 
     useEffect(() => {
         const logoutUser = async () => {
             try {
                 const response = await axios.post('http://localhost:5000/logout', {}, { withCredentials: true });
-                alert(response.data);
-                navigate('/');
+                setMessage(response.data);
             } catch (error) {
                 console.error('There was an error logging out!', error);
+                setMessage('Logout failed');
             }
         };
 
         logoutUser();
-    }, [navigate]);
+    }, []);
 
     return (
         <div>
             <h1>Logging out...</h1>
+            {message && <p>{message}</p>}
         </div>
     );
 };
