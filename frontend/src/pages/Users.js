@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Users = () => {
     const [users, setUsers] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -10,12 +12,16 @@ const Users = () => {
                 const response = await axios.get('http://localhost:5000/users', { withCredentials: true });
                 setUsers(response.data);
             } catch (error) {
-                console.error('There was an error fetching the users!', error);
+                if (error.response && error.response.status === 401) {
+                    navigate('/'); // Редірект на головну сторінку якщо неавторизований
+                } else {
+                    console.error('There was an error fetching the users!', error);
+                }
             }
         };
 
         fetchUsers();
-    }, []);
+    }, [navigate]);
 
     const handleClear = async () => {
         try {
