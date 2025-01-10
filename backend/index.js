@@ -1,3 +1,4 @@
+// Підключення необхідних модулів
 const express = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
@@ -34,6 +35,15 @@ db.connect((err) => {
     console.log('Connected to database');
 });
 
+// Перевірка сесії
+const isAuthenticated = (req, res, next) => {
+    if (req.session.user) {
+        next();
+    } else {
+        res.status(401).send('Not authorized');
+    }
+};
+
 // Маршрут для реєстрації
 app.post('/register', (req, res) => {
     const { name, email, password } = req.body;
@@ -65,10 +75,7 @@ app.post('/login', (req, res) => {
 });
 
 // Маршрут для отримання користувачів
-app.get('/users', (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).send('Not authorized');
-    }
+app.get('/users', isAuthenticated, (req, res) => {
     db.query('SELECT * FROM users', (err, results) => {
         if (err) throw err;
         res.json(results);
@@ -76,10 +83,7 @@ app.get('/users', (req, res) => {
 });
 
 // Маршрут для очищення бази даних
-app.post('/clear', (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).send('Not authorized');
-    }
+app.post('/clear', isAuthenticated, (req, res) => {
     db.query('DELETE FROM users', (err, results) => {
         if (err) throw err;
         res.send('Database cleared');
@@ -87,7 +91,7 @@ app.post('/clear', (req, res) => {
 });
 
 // Маршрут для виходу
-app.post('/logout', (req, res) => {
+app.post('/logout', isAuthenticated, (req, res) => {
     req.session = null;
     res.send('Logged out');
 });
