@@ -90,9 +90,6 @@ app.post('/clear', (req, res) => {
 
 // Маршрут для виходу
 app.post('/logout', (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).send('Not authorized. Please log in.');
-    }
     req.session.destroy((err) => {
         if (err) {
             return res.status(500).send('Error logging out');
