@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
-import { setUser, setMessage } from '../data/reducers/userSlice.js';
+import { setUser } from '../data/reducers/userSlice.js';
+import { setMessage } from '../data/reducers/messageSlice.js';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
