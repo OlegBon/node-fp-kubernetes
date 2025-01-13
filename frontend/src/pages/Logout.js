@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { clearUser, setMessage } from '../data/reducers/userSlice';
+import { clearUser, setMessage } from '../data/reducers/userSlice.js';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
