@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { setUser, setMessage } from './data/reducers';
+import { setUser, setMessage } from './data/reducers/userSliceReducer.js';
 
 const Register = () => {
     const [name, setName] = useState('');

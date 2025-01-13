@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { setUser, setMessage } from './data/reducers';
+import { setUser, setMessage } from './data/reducers/userSliceReducer.js';
 
 const Logout = () => {
     const dispatch = useDispatch();
