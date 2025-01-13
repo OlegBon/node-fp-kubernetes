@@ -1,20 +1,26 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser, setMessage } from './data/reducers';
 
 const Register = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [message, setMessage] = useState('');
+    const message = useSelector((state) => state.message);
+    const dispatch = useDispatch();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const response = await axios.post('http://localhost:5000/register', { name, email, password }, { withCredentials: true });
-            setMessage(response.data);
+            dispatch(setMessage(response.data));
+            if (response.data === 'User registered') {
+                dispatch(setUser({ email }));
+            }
         } catch (error) {
             console.error('There was an error registering the user!', error);
-            setMessage('Registration failed');
+            dispatch(setMessage('Registration failed'));
         }
     };
 

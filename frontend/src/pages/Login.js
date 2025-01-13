@@ -1,19 +1,25 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser, setMessage } from './data/reducers';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [message, setMessage] = useState('');
+    const message = useSelector((state) => state.message);
+    const dispatch = useDispatch();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const response = await axios.post('http://localhost:5000/login', { email, password }, { withCredentials: true });
-            setMessage(response.data);
+            dispatch(setMessage(response.data));
+            if (response.data === 'Login successful') {
+                dispatch(setUser({ email }));
+            }
         } catch (error) {
             console.error('There was an error logging in!', error);
-            setMessage('Login failed');
+            dispatch(setMessage('Login failed'));
         }
     };
 
