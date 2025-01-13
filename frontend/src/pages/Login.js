@@ -34,7 +34,8 @@ const Login = () => {
             {message && (
                 <div className="container top">
                     <p>{message}</p>
-                    {message === 'Login successful! Hi, {user.email)!' && <a href="/users">Go to Users</a>}
+                    {message === 'Login successful!' && <a href="/users">Go to Users</a>}
+                    {user && <p>Hi, {user.email}</p>} 
                 </div>
             )}
         </div>
