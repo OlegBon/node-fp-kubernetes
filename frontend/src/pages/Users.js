@@ -39,7 +39,7 @@ const Users = () => {
             <button onClick={handleClear}>Clear Database</button>
             <ul className="top">
                 {users.map(user => (
-                    <li key={user.id}>{user.name} - {user.email}</li>
+                    <li key={user.id}>{user.name} - {user.email} - {user.last_login}</li>
                 ))}
             </ul>
         </div>

@@ -27,7 +27,7 @@ const Register = () => {
                 <button type="submit">Register</button>
             </form>
             {message && (
-                <div className="top">
+                <div className="container top">
                     <p>{message}</p>
                     {message === 'User registered' && <a href="/users">Go to Users</a>}
                 </div>
