@@ -15,7 +15,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${API_URL}/login`, { email, password }, { withCredentials: true });
+      const response = await axios.post('http://localhost:5000/login', { email, password }, { withCredentials: true });
       dispatch(setUser({ name: response.data.name, email }));
       dispatch(setMessage('Login successful'));
       navigate('/');
