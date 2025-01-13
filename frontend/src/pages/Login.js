@@ -1,45 +1,34 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
-import { setUser, setMessage } from '../data/reducers/userSliceReducer.js';
+import { useDispatch } from 'react-redux';
+import { setUser, setMessage } from '../data/reducers/userSlice';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const message = useSelector((state) => state.message);
-    const user = useSelector((state) => state.user);
-    const dispatch = useDispatch();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await axios.post('http://localhost:5000/login', { email, password }, { withCredentials: true });
-            dispatch(setMessage(response.data));
-            if (response.data === 'Login successful') {
-                dispatch(setUser({ email }));
-            }
-        } catch (error) {
-            console.error('There was an error logging in!', error);
-            dispatch(setMessage('Login failed'));
-        }
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/login`, { email, password }, { withCredentials: true });
+      dispatch(setUser({ name: response.data.name, email }));
+      dispatch(setMessage('Login successful'));
+      navigate('/');
+    } catch (error) {
+      dispatch(setMessage('Login failed'));
+    }
+  };
 
-    return (
-        <div>
-            <form className="container" onSubmit={handleSubmit}>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
-                <button type="submit">Login</button>
-            </form>
-            {message && (
-                <div className="container top">
-                    <p>{message}</p>
-                    {message === 'Login successful' && <a href="/users">Go to Users</a>}
-                    {user && <p>Hi, {user.email}</p>} 
-                </div>
-            )}
-        </div>
-    );
+  return (
+    <form className="container" onSubmit={handleSubmit}>
+      <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
+      <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
+  );
 };
 
 export default Login;

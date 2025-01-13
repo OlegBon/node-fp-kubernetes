@@ -1,22 +1,36 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Users from './pages/Users';
 import Logout from './pages/Logout';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
+  const user = useSelector((state) => state.user);
+
   return (
     <Router>
       <Routes>
         <Route path="/" element={
-          <div>
-            <h2>Welcome! Please <Link to="/login">Login</Link> or <Link to="/register">Register</Link>.</h2>
-          </div>
-        } />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/users" element={<Users />} />
+            <div>
+              {user ? (
+                <>
+                  <p>Welcome, {user.name} ({user.email})!</p>
+                  <Link to="/users">Users</Link> | <Link to="/logout">Logout</Link>
+                </>
+              ) : (
+                <>
+                  <h2>Please <Link to="/login">Login</Link> or <Link to="/register">Register</Link>.</h2>
+                </>
+              )}
+            </div>
+          }
+        />
+        <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
+        <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
+        <Route path="/users" element={<ProtectedRoute element={<Users />} />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="*" element={<div>Page not found</div>} />
       </Routes>

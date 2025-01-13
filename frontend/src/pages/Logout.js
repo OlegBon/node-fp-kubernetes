@@ -1,36 +1,28 @@
 import React, { useEffect } from 'react';
-import axios from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { clearUser, setMessage } from '../data/reducers/userSlice';
 import { useNavigate } from 'react-router-dom';
-import { setUser, setMessage } from '../data/reducers/userSliceReducer.js';
+import axios from 'axios';
 
 const Logout = () => {
-    const dispatch = useDispatch();
-    const user = useSelector((state) => state.user);
-    const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const logoutUser = async () => {
-            try {
-                const response = await axios.post('http://localhost:5000/logout', {}, { withCredentials: true });
-                dispatch(setMessage(response.data));
-                dispatch(setUser(null));
-                navigate('/');
-            } catch (error) {
-                console.error('There was an error logging out!', error);
-                dispatch(setMessage('Logout failed'));
-            }
-        };
+  useEffect(() => {
+    const logoutUser = async () => {
+      try {
+        await axios.post(`${process.env.REACT_APP_API_URL}/logout`, {}, { withCredentials: true });
+        dispatch(clearUser());
+        dispatch(setMessage('Logged out successfully'));
+        navigate('/');
+      } catch (error) {
+        dispatch(setMessage('Logout failed'));
+      }
+    };
+    logoutUser();
+  }, [dispatch, navigate]);
 
-        logoutUser();
-    }, [dispatch, navigate]);
-
-    return (
-        <div className="container">
-            {user && <p>Bye, {user.name} ({user.email})! Take you care.</p>} 
-            <h1>Logging out...</h1>
-        </div>
-    );
+  return <div className="container">Logging out...</div>;
 };
 
 export default Logout;
