@@ -22,7 +22,7 @@ const Logout = () => {
     }, [navigate]);
 
     return (
-        <div>
+        <div className="container">
             <h1>Logging out...</h1>
             {message && <p>{message}</p>}
         </div>

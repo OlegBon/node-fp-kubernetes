@@ -33,11 +33,11 @@ const Users = () => {
     };
 
     return (
-        <div>
+        <div className="container">
             <h1>Users</h1>
             {message && <p>{message}</p>}
             <button onClick={handleClear}>Clear Database</button>
-            <ul>
+            <ul className="top">
                 {users.map(user => (
                     <li key={user.id}>{user.name} - {user.email}</li>
                 ))}

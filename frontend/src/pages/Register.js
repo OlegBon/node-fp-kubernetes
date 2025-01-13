@@ -19,7 +19,7 @@ const Register = () => {
     };
 
     return (
-        <div>
+        <div className="container">
             <form onSubmit={handleSubmit}>
                 <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" required />
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
@@ -27,7 +27,7 @@ const Register = () => {
                 <button type="submit">Register</button>
             </form>
             {message && (
-                <div>
+                <div className="top">
                     <p>{message}</p>
                     {message === 'User registered' && <a href="/users">Go to Users</a>}
                 </div>
