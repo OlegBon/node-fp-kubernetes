@@ -7,6 +7,7 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const message = useSelector((state) => state.message);
+    const user = useSelector((state) => state.user);
     const dispatch = useDispatch();
 
     const handleSubmit = async (e) => {
@@ -25,6 +26,7 @@ const Login = () => {
 
     return (
         <div>
+            {user && <p>Hi, {user.name} ({user.email})!</p>} 
             <form className="container" onSubmit={handleSubmit}>
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
                 <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />

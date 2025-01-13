@@ -6,6 +6,7 @@ import { setUser, setMessage } from '../data/reducers/userSliceReducer.js';
 
 const Logout = () => {
     const dispatch = useDispatch();
+    const user = useSelector((state) => state.user);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -26,6 +27,7 @@ const Logout = () => {
 
     return (
         <div className="container">
+            {user && <p>Bye, {user.name} ({user.email})! Take you care.</p>} 
             <h1>Logging out...</h1>
         </div>
     );

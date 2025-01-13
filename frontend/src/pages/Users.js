@@ -4,6 +4,7 @@ import axios from 'axios';
 const Users = () => {
     const [users, setUsers] = useState([]);
     const [message, setMessage] = useState('');
+    const user = useSelector((state) => state.user);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -35,6 +36,7 @@ const Users = () => {
     return (
         <div className="container">
             <h1>Users</h1>
+            {user && <p>Hi, {user.name} ({user.email}}!</p>} 
             {message && <p>{message}</p>}
             <button onClick={handleClear}>Clear Database</button>
             <ul className="top">
