@@ -21,7 +21,9 @@ const Login = () => {
         <div className="container">
             <form onSubmit={handleSubmit}>
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
+		<br />
                 <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
+                <br />
                 <button type="submit">Login</button>
             </form>
             {message && (
