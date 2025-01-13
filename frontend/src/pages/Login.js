@@ -26,7 +26,6 @@ const Login = () => {
 
     return (
         <div>
-            {user && <p>Hi, {user.name} ({user.email})!</p>} 
             <form className="container" onSubmit={handleSubmit}>
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
                 <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
@@ -35,7 +34,7 @@ const Login = () => {
             {message && (
                 <div className="container top">
                     <p>{message}</p>
-                    {message === 'Login successful' && <a href="/users">Go to Users</a>}
+                    {message === 'Login successful! Hi, {user.email)!' && <a href="/users">Go to Users</a>}
                 </div>
             )}
         </div>
