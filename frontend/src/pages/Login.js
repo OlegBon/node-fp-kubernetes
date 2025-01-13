@@ -15,6 +15,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/login`, { email, password }, { withCredentials: true });
+      console.log('Registration Response:', response.data);
       dispatch(setUser({ name: response.data.name, email }));
       dispatch(setMessage('Login successful'));
       navigate('/');

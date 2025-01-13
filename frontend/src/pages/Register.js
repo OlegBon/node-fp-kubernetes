@@ -17,6 +17,7 @@ const Register = () => {
     e.preventDefault();
     try {
       const response = await axios.post(`${API_URL}/register`, { name, email, password }, { withCredentials: true });
+      console.log('Registration Response:', response.data);
       dispatch(setUser({ name, email }));
       dispatch(setMessage('User registered successfully'));
       navigate('/users');
