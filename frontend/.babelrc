@@ -5,6 +5,7 @@
   ],
   "plugins": [
     "@babel/plugin-transform-runtime",
-    "@babel/plugin-syntax-import-meta" // Для підтримки імпорту з axios
+    "@babel/plugin-syntax-import-meta",
+    "@babel/plugin-transform-modules-commonjs"
   ]
 }
