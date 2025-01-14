@@ -11,12 +11,11 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const API_URL = process.env.REACT_APP_API_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${API_URL}/register`, { name, email, password }, { withCredentials: true });
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/register`, { name, email, password }, { withCredentials: true });
       console.log('Registration Response:', response.data);
       dispatch(setUser({ name, email }));
       dispatch(setMessage('User registered successfully'));
