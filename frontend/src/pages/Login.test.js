@@ -1,6 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { render, screen, fireEvent, waitFor } from '../tests/test-utils';
 import Login from './Login';
 
 test('renders login form', () => {
@@ -14,7 +13,7 @@ test('renders login form', () => {
   expect(loginButton).toBeInTheDocument();
 });
 
-test('submits login form', () => {
+test('submits login form and handles failure', async () => {
   render(<Login />);
   const emailInput = screen.getByPlaceholderText(/Email/i);
   const passwordInput = screen.getByPlaceholderText(/Password/i);
@@ -24,6 +23,9 @@ test('submits login form', () => {
   fireEvent.change(passwordInput, { target: { value: 'password' } });
   fireEvent.click(loginButton);
 
-  const message = screen.getByText(/Login failed/i);
-  expect(message).toBeInTheDocument();
+  // Ожидание появления сообщения
+  await waitFor(() => {
+    const message = screen.getByText(/Login failed/i);
+    expect(message).toBeInTheDocument();
+  });
 });
