@@ -17,12 +17,16 @@ const App = () => {
             <div>
               {user ? (
                 <>
-                  <p>Welcome, {user.name} ({user.email})!</p>
-                  <Link to="/users">Users</Link> | <Link to="/logout">Logout</Link>
+                  <div className="container">
+                    <p>Welcome, {user.name} ({user.email})!</p>
+                    <Link to="/users">Users</Link> | <Link to="/logout">Logout</Link>
+                  </div>
                 </>
               ) : (
                 <>
-                  <h2>Please <Link to="/login">Login</Link> or <Link to="/register">Register</Link>.</h2>
+                  <div className="container">
+                    <h2>Please <Link to="/login">Login</Link> or <Link to="/register">Register</Link>.</h2>
+                  </div>
                 </>
               )}
             </div>

@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
+import { setUser } from '../data/reducers/userSlice';
 import { setUsers } from '../data/reducers/usersSlice';
 import { setMessage } from '../data/reducers/messageSlice';
 
 const Users = () => {
+  const user = useSelector((state) => state.user);
   const users = useSelector((state) => state.users);
   const dispatch = useDispatch();
 
@@ -21,14 +23,26 @@ const Users = () => {
     fetchUsers();
   }, [dispatch]);
 
+  const handleClear = async () => {
+    try {
+        const response = await axios.post('http://localhost:5000/clear', {}, { withCredentials: true });
+        alert(response.data);
+        setUsers([]);
+    } catch (error) {
+        console.error('There was an error clearing the database!', error);
+    }
+  };
+
   return (
     <div className="container">
       <h1>Users</h1>
+      {user && <p>Hi, {user.name} ({user.email}!</p>} 
+      <button onClick={handleClear}>Clear Database</button>
       {users.length ? (
         <ul>
           {users.map((user) => (
             <li key={user.id}>
-              <strong>{user.name}</strong> ({user.email})
+              <strong>{user.name}</strong> - {user.email} - {user.last_login}
             </li>
           ))}
         </ul>
