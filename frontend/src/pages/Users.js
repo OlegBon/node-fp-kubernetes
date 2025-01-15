@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { setUser } from '../data/reducers/userSlice';
 import { setUsers } from '../data/reducers/usersSlice';
 import { setMessage } from '../data/reducers/messageSlice';
 
@@ -25,18 +24,18 @@ const Users = () => {
 
   const handleClear = async () => {
     try {
-        const response = await axios.post('http://localhost:5000/clear', {}, { withCredentials: true });
-        alert(response.data);
-        setUsers([]);
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/clear`, {}, { withCredentials: true });
+      alert(response.data);
+      dispatch(setUsers([])); // Очищаємо список користувачів у Redux
     } catch (error) {
-        console.error('There was an error clearing the database!', error);
+      console.error('There was an error clearing the database!', error);
     }
   };
 
   return (
     <div className="container">
       <h1>Users</h1>
-      {user && <p>Hi, {user.name} ({user.email}!</p>} 
+      {user && <p>Hi, {user.name} ({user.email}!)</p>} 
       <button onClick={handleClear}>Clear Database</button>
       {users.length ? (
         <ul>

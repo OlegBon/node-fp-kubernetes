@@ -12,6 +12,10 @@ body {
   font-size: 20px;
 }
 
+.block {
+  display: block;
+}
+
 .container button {
   background-color: green;
   color: white;
