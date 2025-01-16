@@ -35,13 +35,13 @@ const Users = () => {
   return (
     <div className="container">
       <h1>Users</h1>
-      {user && <p>Hi, {user.name} ({user.email}!)</p>} 
+      {user && <p>Hi, {user.name} ({user.email}!)</p>}
       <button onClick={handleClear}>Clear Database</button>
       {users.length ? (
         <ul>
           {users.map((user) => (
             <li key={user.id}>
-              <strong>{user.name}</strong> - {user.email} - {user.last_login}
+              <strong>{user.name}</strong> - {user.email} - {user.updatedAt}
             </li>
           ))}
         </ul>

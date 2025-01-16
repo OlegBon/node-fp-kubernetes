@@ -3,6 +3,7 @@ import session from 'express-session';
 import cors from 'cors';
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
+import { Op } from 'sequelize'; // Імпорт Op з sequelize
 import config from './config/config.js';
 import { User } from './models/index.js';
 import sequelize from './config/db.js';
