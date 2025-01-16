@@ -2,9 +2,10 @@ import express from 'express';
 import session from 'express-session';
 import cors from 'cors';
 import bcrypt from 'bcrypt';
-import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
 import config from './config/config.js';
+import { User } from './models/index.js';
+import sequelize from './config/db.js';
 
 // Завантаження змінних оточення з .env
 dotenv.config();
@@ -30,21 +31,14 @@ app.use(session({
     secure: false, // Використовується HTTP, а не HTTPS
     httpOnly: true, // Заборона доступу до куки через JavaScript
     maxAge: 24 * 60 * 60 * 1000, // Час життя куки: 24 години
+    sameSite: 'strict', // Додано атрибут SameSite
   },
 }));
 
-// Підключення до бази даних
-let db; // Змінна для збереження підключення
-const connectToDatabase = async () => {
-  try {
-    db = await mysql.createConnection(config); // Підключення за даними з config.js
-    console.log('Підключено до бази даних');
-  } catch (error) {
-    console.error('Помилка підключення до бази даних:', error);
-    process.exit(1); // Завершення процесу у випадку невдачі
-  }
-};
-await connectToDatabase(); // Виклик функції підключення
+// Синхронізація моделі з базою даних
+sequelize.sync({ alter: true })
+  .then(() => console.log('Моделі синхронізовані з базою даних'))
+  .catch((error) => console.error('Помилка синхронізації:', error));
 
 // Маршрут для реєстрації нового користувача
 app.post('/register', async (req, res) => {
@@ -128,6 +122,17 @@ app.post('/clear', async (req, res) => {
     res.json({ message: 'Базу даних очищено' });
   } catch (error) {
     console.error('Помилка очищення бази даних:', error);
+    res.status(500).json({ error: 'Внутрішня помилка сервера' });
+  }
+});
+
+// Маршрут для отримання всіх користувачів
+app.get('/users', async (req, res) => {
+  try {
+    const users = await User.findAll(); // Використання Sequelize для отримання всіх користувачів
+    res.json(users);
+  } catch (error) {
+    console.error('Помилка отримання користувачів:', error);
     res.status(500).json({ error: 'Внутрішня помилка сервера' });
   }
 });
