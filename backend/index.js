@@ -41,6 +41,14 @@ sequelize.sync({ alter: true })
   .then(() => console.log('Моделі синхронізовані з базою даних'))
   .catch((error) => console.error('Помилка синхронізації:', error));
 
+// Проміжна функція перевірки сесії
+function checkSession(req, res, next) {
+  if (!req.session.user) {
+    return res.status(401).json({ error: 'Користувач не авторизований' });
+  }
+  next();
+}
+
 // Маршрут для реєстрації нового користувача
 app.post('/register', async (req, res) => {
   try {
@@ -112,11 +120,8 @@ app.post('/logout', (req, res) => {
 });
 
 // Маршрут для очищення бази даних
-app.post('/clear', async (req, res) => {
+app.post('/clear', checkSession, async (req, res) => {
   try {
-    if (!req.session.user) {
-      return res.status(401).json({ error: 'Користувач не авторизований' });
-    }
     await User.destroy({ where: {}, truncate: true });
     res.json({ message: 'Базу даних очищено' });
   } catch (error) {
@@ -126,7 +131,7 @@ app.post('/clear', async (req, res) => {
 });
 
 // Маршрут для отримання всіх користувачів
-app.get('/users', async (req, res) => {
+app.get('/users', checkSession, async (req, res) => {
   try {
     const users = await User.findAll();
     res.json(users);
@@ -145,3 +150,4 @@ app.use((req, res) => {
 app.listen(port, () => {
   console.log(`Сервер працює на порту ${port}`);
 });
+
