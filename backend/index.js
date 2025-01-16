@@ -14,7 +14,7 @@ const app = express();
 const port = process.env.APP_PORT || 5000;
 
 // Middleware для обробки JSON-запитів
-app.use(express.json()); 
+app.use(express.json());
 
 // Налаштування CORS для роботи з фронтендом
 app.use(cors({
@@ -27,7 +27,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'my_secret_key', // Секретний ключ для сесій
   resave: false, // Заборона перезаписувати сесію без змін
   saveUninitialized: true, // Збереження неініціалізованих сесій
-  cookie: { 
+  cookie: {
     secure: false, // Використовується HTTP, а не HTTPS
     httpOnly: true, // Заборона доступу до куки через JavaScript
     maxAge: 24 * 60 * 60 * 1000, // Час життя куки: 24 години
@@ -45,21 +45,20 @@ app.post('/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Перевірка наявності обов'язкових полів
     if (!name || !email || !password) {
       return res.status(400).json({ error: 'Всі поля є обов\'язковими' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10); // Хешування паролю
-    const [users] = await db.execute('SELECT * FROM users WHERE email = ? OR name = ?', [email, name]);
+    const userExists = await User.findOne({ where: { [Op.or]: [{ email }, { name }] } });
 
-    if (users.length > 0) {
+    if (userExists) {
       return res.status(400).json({ error: 'Користувач вже існує' });
     }
 
-    // Додавання нового користувача до бази даних
-    await db.execute('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [name, email, hashedPassword]);
-    req.session.user = { name, email }; // Збереження даних користувача в сесії
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await User.create({ name, email, password: hashedPassword });
+
+    req.session.user = { id: user.id, name: user.name, email: user.email };
     res.status(201).json({ message: 'Користувача зареєстровано' });
   } catch (error) {
     console.error('Помилка під час реєстрації:', error);
@@ -72,20 +71,19 @@ app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const [users] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
+    const user = await User.findOne({ where: { email } });
 
-    if (users.length === 0) {
+    if (!user) {
       return res.status(404).json({ error: 'Користувач не знайдений' });
     }
 
-    const user = users[0];
-    const isPasswordValid = await bcrypt.compare(password, user.password); // Перевірка паролю
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
       return res.status(401).json({ error: 'Невірний пароль' });
     }
 
-    req.session.user = { id: user.id, name: user.name, email: user.email }; // Збереження авторизації
+    req.session.user = { id: user.id, name: user.name, email: user.email };
     res.json({ message: 'Успішний вхід' });
   } catch (error) {
     console.error('Помилка під час входу:', error);
@@ -118,7 +116,7 @@ app.post('/clear', async (req, res) => {
     if (!req.session.user) {
       return res.status(401).json({ error: 'Користувач не авторизований' });
     }
-    await db.execute('DELETE FROM users'); // Видалення всіх записів з таблиці
+    await User.destroy({ where: {}, truncate: true });
     res.json({ message: 'Базу даних очищено' });
   } catch (error) {
     console.error('Помилка очищення бази даних:', error);
@@ -129,7 +127,7 @@ app.post('/clear', async (req, res) => {
 // Маршрут для отримання всіх користувачів
 app.get('/users', async (req, res) => {
   try {
-    const users = await User.findAll(); // Використання Sequelize для отримання всіх користувачів
+    const users = await User.findAll();
     res.json(users);
   } catch (error) {
     console.error('Помилка отримання користувачів:', error);
