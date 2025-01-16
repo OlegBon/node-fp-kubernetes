@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios';
+import { setUser, clearUser } from './data/reducers/userSlice';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Users from './pages/Users';
@@ -9,6 +11,20 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
   const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/session`, { withCredentials: true });
+        dispatch(setUser(response.data));
+      } catch (error) {
+        dispatch(clearUser());
+      }
+    };
+
+    checkSession();
+  }, [dispatch]);
 
   return (
     <Router>

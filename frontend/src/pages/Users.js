@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUsers } from '../data/reducers/usersSlice';
 import { setMessage } from '../data/reducers/messageSlice';
+import { clearUser } from '../data/reducers/userSlice';
 
 const Users = () => {
   const user = useSelector((state) => state.user);
@@ -15,6 +16,9 @@ const Users = () => {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/users`, { withCredentials: true });
         dispatch(setUsers(response.data));
       } catch (error) {
+        if (error.response && error.response.status === 401) {
+          dispatch(clearUser());
+        }
         dispatch(setMessage('Failed to fetch users'));
       }
     };
