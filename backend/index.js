@@ -1,108 +1,143 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const mysql = require('mysql2');
-const session = require('express-session');
-const cors = require('cors');
+import express from 'express';
+import session from 'express-session';
+import cors from 'cors';
+import bcrypt from 'bcrypt';
+import mysql from 'mysql2/promise';
+import dotenv from 'dotenv';
+import config from './config/config.js';
+
+// Завантаження змінних оточення з .env
+dotenv.config();
 
 const app = express();
-const port = 5000;
+const port = process.env.APP_PORT || 5000;
 
-app.use(bodyParser.json());
+// Middleware для обробки JSON-запитів
+app.use(express.json()); 
+
+// Налаштування CORS для роботи з фронтендом
 app.use(cors({
-    origin: 'http://localhost:3000', // URL фронтенду
-    credentials: true
+  origin: 'http://localhost:3000', // URL вашого фронтенду
+  credentials: true, // Дозвіл передавати куки між сервером і клієнтом
 }));
+
+// Налаштування сесій для збереження авторизації користувачів
 app.use(session({
-    secret: 'my_secret_key',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false, httpOnly: true, maxAge: 24 * 60 * 60 * 1000 } // 24 години
+  secret: process.env.SESSION_SECRET || 'my_secret_key', // Секретний ключ для сесій
+  resave: false, // Заборона перезаписувати сесію без змін
+  saveUninitialized: true, // Збереження неініціалізованих сесій
+  cookie: { 
+    secure: false, // Використовується HTTP, а не HTTPS
+    httpOnly: true, // Заборона доступу до куки через JavaScript
+    maxAge: 24 * 60 * 60 * 1000, // Час життя куки: 24 години
+  },
 }));
 
 // Підключення до бази даних
-const db = mysql.createConnection({
-    host: 'database',
-    user: 'root',
-    password: 'rootpassword',
-    database: 'myapp'
-});
+let db; // Змінна для збереження підключення
+const connectToDatabase = async () => {
+  try {
+    db = await mysql.createConnection(config); // Підключення за даними з config.js
+    console.log('Підключено до бази даних');
+  } catch (error) {
+    console.error('Помилка підключення до бази даних:', error);
+    process.exit(1); // Завершення процесу у випадку невдачі
+  }
+};
+await connectToDatabase(); // Виклик функції підключення
 
-db.connect((err) => {
-    if (err) {
-        console.error('Error connecting to database:', err);
-        return;
-    }
-    console.log('Connected to database');
-});
-
-// Маршрут для реєстрації
-app.post('/register', (req, res) => {
+// Маршрут для реєстрації нового користувача
+app.post('/register', async (req, res) => {
+  try {
     const { name, email, password } = req.body;
-    db.query('SELECT * FROM users WHERE email = ? OR name = ?', [email, name], (err, results) => {
-        if (err) throw err;
-        if (results.length > 0) {
-            res.send('User already exists');
-        } else {
-            db.query('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [name, email, password], (err, results) => {
-                if (err) throw err;
-                req.session.user = { name, email }; // Зберігаємо користувача в сесії
-                res.send('User registered');
-            });
-        }
-    });
-});
 
-// Маршрут для логіну
-app.post('/login', (req, res) => {
-    const { email, password } = req.body;
-    db.query('SELECT * FROM users WHERE email = ? AND password = ?', [email, password], (err, results) => {
-        if (err) throw err;
-        if (results.length > 0) {
-            req.session.user = results[0]; // Зберігаємо користувача в сесії
-            res.send('Login successful');
-        } else {
-            res.send('Invalid credentials');
-        }
-    });
-});
-
-// Маршрут для отримання користувачів
-app.get('/users', (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).send('Not authorized. Please log in.');
+    // Перевірка наявності обов'язкових полів
+    if (!name || !email || !password) {
+      return res.status(400).json({ error: 'Всі поля є обов\'язковими' });
     }
-    db.query('SELECT * FROM users', (err, results) => {
-        if (err) throw err;
-        res.json(results);
-    });
+
+    const hashedPassword = await bcrypt.hash(password, 10); // Хешування паролю
+    const [users] = await db.execute('SELECT * FROM users WHERE email = ? OR name = ?', [email, name]);
+
+    if (users.length > 0) {
+      return res.status(400).json({ error: 'Користувач вже існує' });
+    }
+
+    // Додавання нового користувача до бази даних
+    await db.execute('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [name, email, hashedPassword]);
+    req.session.user = { name, email }; // Збереження даних користувача в сесії
+    res.status(201).json({ message: 'Користувача зареєстровано' });
+  } catch (error) {
+    console.error('Помилка під час реєстрації:', error);
+    res.status(500).json({ error: 'Внутрішня помилка сервера' });
+  }
+});
+
+// Маршрут для входу користувача
+app.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const [users] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
+
+    if (users.length === 0) {
+      return res.status(404).json({ error: 'Користувач не знайдений' });
+    }
+
+    const user = users[0];
+    const isPasswordValid = await bcrypt.compare(password, user.password); // Перевірка паролю
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Невірний пароль' });
+    }
+
+    req.session.user = { id: user.id, name: user.name, email: user.email }; // Збереження авторизації
+    res.json({ message: 'Успішний вхід' });
+  } catch (error) {
+    console.error('Помилка під час входу:', error);
+    res.status(500).json({ error: 'Внутрішня помилка сервера' });
+  }
+});
+
+// Маршрут для перевірки активної сесії
+app.get('/session', (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({ error: 'Користувач не авторизований' });
+  }
+  res.json(req.session.user);
+});
+
+// Маршрут для виходу користувача
+app.post('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Помилка під час виходу:', err);
+      return res.status(500).json({ error: 'Помилка сервера' });
+    }
+    res.json({ message: 'Вихід виконано' });
+  });
 });
 
 // Маршрут для очищення бази даних
-app.post('/clear', (req, res) => {
+app.post('/clear', async (req, res) => {
+  try {
     if (!req.session.user) {
-        return res.status(401).send('Not authorized. Please log in.');
+      return res.status(401).json({ error: 'Користувач не авторизований' });
     }
-    db.query('DELETE FROM users', (err, results) => {
-        if (err) throw err;
-        res.send('Database cleared');
-    });
+    await db.execute('DELETE FROM users'); // Видалення всіх записів з таблиці
+    res.json({ message: 'Базу даних очищено' });
+  } catch (error) {
+    console.error('Помилка очищення бази даних:', error);
+    res.status(500).json({ error: 'Внутрішня помилка сервера' });
+  }
 });
 
-// Маршрут для виходу
-app.post('/logout', (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            return res.status(500).send('Error logging out');
-        }
-        res.send('Logged out');
-    });
-});
-
-// Маршрут для помилок
+// Обробка помилок для неіснуючих маршрутів
 app.use((req, res) => {
-    res.status(404).send('Page not found');
+  res.status(404).json({ error: 'Сторінка не знайдена' });
 });
 
+// Запуск сервера
 app.listen(port, () => {
-    console.log(`Backend running on port ${port}`);
+  console.log(`Сервер працює на порту ${port}`);
 });
