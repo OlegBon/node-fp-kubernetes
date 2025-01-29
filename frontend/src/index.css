@@ -3,13 +3,15 @@ body {
 }
 
 .container {
-  margin-top: 80px;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   gap: 20px;
   font-size: 20px;
+  width: 426px;
+  margin: 0 auto;
+  padding-top: 80px;
 }
 
 .container button {
@@ -23,16 +25,26 @@ body {
   border-radius: 10px;
   font-size: 20px;
   font-weight: 600;
+  min-width: 100%;
 }
 
 .container button:hover {
-  border: 2px solid whitesmoke;
+  border: 2px solid green;
+  background-color: #fff;
+  color: green;
 }
 
 .container input {
   font-size: 20px;
+  min-width: 100%;
 }
 
 .container .top {
   margin-top: 40px;
+}
+
+.container ul {
+  list-style-type: none;
+  padding: 0;
+  font-size: 18px;
 }

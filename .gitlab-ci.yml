@@ -1,6 +1,7 @@
 stages:
   - build
-  - test
+  - test_frontend
+  - test_backend
   - deploy
 
 variables:
@@ -18,14 +19,29 @@ build:
   script:
     - docker-compose build
 
-#test:
-#  stage: test
-#  image: node:22
-#  before_script:
-#    - cd frontend
-#    - npm install
-#  script:
-#    - npm test
+test_frontend:
+  stage: test_frontend
+  image: node:22
+  before_script:
+    - cd frontend
+    - npm install
+  script:
+    - npm test
+
+test_backend:
+  stage: test_backend
+  image: node:22
+  services:
+    - name: mysql:8
+      alias: mysql
+  variables:
+    MYSQL_ROOT_PASSWORD: rootpassword
+    MYSQL_DATABASE: myapp
+  before_script:
+    - cd backend
+    - npm install
+  script:
+    - npm test
 
 deploy:
   stage: deploy

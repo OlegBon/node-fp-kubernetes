@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { Navigate } from 'react-router-dom';
-import axios from 'axios';
-import { setUser, clearUser } from '../data/reducers/userSlice';
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Navigate } from "react-router-dom";
+import { verifyToken } from "../utils/verifyToken";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const ProtectedRoute = ({ element }) => {
   const [loading, setLoading] = useState(true);
@@ -10,24 +10,18 @@ const ProtectedRoute = ({ element }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/session`, { withCredentials: true });
-        dispatch(setUser(response.data));
-      } catch (error) {
-        dispatch(clearUser());
-      } finally {
-        setLoading(false);
-      }
+    const fetchData = async () => {
+      const isTokenValid = await verifyToken(dispatch);
+      setLoading(!isTokenValid);
     };
-
-    checkSession();
+    fetchData();
   }, [dispatch]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingSpinner />;
   }
 
+  // Перевірка, чи є користувач
   return user ? element : <Navigate to="/login" />;
 };
 
