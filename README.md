@@ -237,27 +237,27 @@ cbs-node-final-project/
 - `GET /users` - Отримати всіх користувачів (потрібен токен)
 - `POST /users/clear` - Очистити базу даних (потрібен токен)
 
-### CI/CD та Docker
+## CI/CD та Docker
 
-#### Dockerfile
+### Dockerfile
 
-##### Backend Dockerfile
+#### Backend Dockerfile
 
 Цей Dockerfile описує створення Docker образу для бекенду Node.js. Він включає всі необхідні залежності та конфігурації для запуску серверу Node.js.
 
-##### Frontend Dockerfile
+#### Frontend Dockerfile
 
 Цей Dockerfile описує створення Docker образу для фронтенду React.js. Він налаштовує середовище та встановлює всі необхідні залежності для запуску React-додатку.
 
-#### docker-compose.yml
+### docker-compose.yml
 
 Цей файл описує як запускати кілька сервісів у Docker контейнерах одночасно. Він забезпечує одночасний запуск бекенду, фронтенду та бази даних.
 
-#### .gitlab-ci.yml
+### .gitlab-ci.yml
 
 Файл `.gitlab-ci.yml` налаштовує конвеєри для CI/CD у GitLab. Він включає кілька стадій для збірки, тестування та деплою проекту.
 
-##### Опис стадій у .gitlab-ci.yml
+#### Опис стадій у .gitlab-ci.yml
 
 1. **build**:
 
