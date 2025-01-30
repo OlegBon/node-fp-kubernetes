@@ -30,12 +30,12 @@
 
 1. Клонування репозиторію:
    ```sh
-   git clone https://github.com/OlegBon/cbs-node-final-project.git
+   git clone https://github.com/OlegBon/node-fp-docker-compose.git
    ```
 2. Перехід до директорії проекту:
 
    ```sh
-   cd cbs-node-final-project
+   cd node-fp-docker-compose
    ```
 
 3. Встановлення залежностей для сервера:
@@ -103,50 +103,60 @@ cbs-node-final-project/
 │   │   └──tokenUtils.test.js
 │   ├── utils/
 │   │   └──tokenUtils.js
+│   ├── .env
 │   ├── babel.config.js
+│   ├── Dockerfile
 │   ├── jest.config.js
 │   ├── package.json
 │   └── server.js
 │
 ├── database/
+│   ├── Dockerfile
 │   └── init.sql
 │
-└── frontend/
-    ├── public/
-    ├── src/
-    │   ├── __mocks__/
-    │   │   └──axios.js
-    │   ├── components/
-    │   │   ├──AppRoutes.js
-    │   │   ├──InputField.js
-    │   │   ├──LoadingSpinner.js
-    │   │   ├──ProtectedRoute.js
-    │   │   └──UserList.js
-    │   ├── data/
-    │   │   ├── reducers/
-    │   │   │   ├──LoadingSpinner.js
-    │   │   │   ├──ProtectedRoute.js
-    │   │   │   └──UserList.js
-    │   │   └── store/
-    │   │       └──store.js
-    │   ├── pages/
-    │   │   ├──Error.js
-    │   │   ├──Login.js
-    │   │   ├──Logout.js
-    │   │   ├──Register.js
-    │   │   └──Users.js
-    │   ├── utils/
-    │   │   ├──fetchUsers.js
-    │   │   ├──registerUser.js
-    │   │   └──verifyToken.js
-    │   ├── App.js
-    │   ├── index.css
-    │   ├── index.js
-    │   └── logo.svg
-    ├── babel.config.js
-    ├── config-overrides.js
-    ├── jest.config.js
-    └── package.json
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── __mocks__/
+│   │   │   └──axios.js
+│   │   ├── components/
+│   │   │   ├──AppRoutes.js
+│   │   │   ├──InputField.js
+│   │   │   ├──LoadingSpinner.js
+│   │   │   ├──ProtectedRoute.js
+│   │   │   └──UserList.js
+│   │   ├── data/
+│   │   │   ├── reducers/
+│   │   │   │   ├──LoadingSpinner.js
+│   │   │   │   ├──ProtectedRoute.js
+│   │   │   │   └──UserList.js
+│   │   │   └── store/
+│   │   │       └──store.js
+│   │   ├── pages/
+│   │   │   ├──Error.js
+│   │   │   ├──Login.js
+│   │   │   ├──Logout.js
+│   │   │   ├──Register.js
+│   │   │   └──Users.js
+│   │   ├── utils/
+│   │   │   ├──fetchUsers.js
+│   │   │   ├──registerUser.js
+│   │   │   └──verifyToken.js
+│   │   ├── App.js
+│   │   ├── index.css
+│   │   ├── index.js
+│   │   └── logo.svg
+│   ├── .env
+│   ├── babel.config.js
+│   ├── config-overrides.js
+│   ├── Dockerfile
+│   ├── jest.config.js
+│   └── package.json
+├── .gitignore
+├── .gitlab-ci.yml
+├── docker-compose.yml
+├── LICENSE
+└── README.md
 ```
 
 ## Структура проекту
@@ -226,6 +236,52 @@ cbs-node-final-project/
 
 - `GET /users` - Отримати всіх користувачів (потрібен токен)
 - `POST /users/clear` - Очистити базу даних (потрібен токен)
+
+### CI/CD та Docker
+
+#### Dockerfile
+
+##### Backend Dockerfile
+
+Цей Dockerfile описує створення Docker образу для бекенду Node.js. Він включає всі необхідні залежності та конфігурації для запуску серверу Node.js.
+
+##### Frontend Dockerfile
+
+Цей Dockerfile описує створення Docker образу для фронтенду React.js. Він налаштовує середовище та встановлює всі необхідні залежності для запуску React-додатку.
+
+#### docker-compose.yml
+
+Цей файл описує як запускати кілька сервісів у Docker контейнерах одночасно. Він забезпечує одночасний запуск бекенду, фронтенду та бази даних.
+
+#### .gitlab-ci.yml
+
+Файл `.gitlab-ci.yml` налаштовує конвеєри для CI/CD у GitLab. Він включає кілька стадій для збірки, тестування та деплою проекту.
+
+##### Опис стадій у .gitlab-ci.yml
+
+1. **build**:
+
+   - Використовується образ `docker:latest`.
+   - Перед виконанням скриптів встановлюється `docker-compose`.
+   - Скрипти збирають Docker образи.
+
+2. **test_frontend**:
+
+   - Використовується образ `node:22`.
+   - Перед виконанням скриптів встановлюються залежності фронтенду та остання версія npm.
+   - Скрипти запускають тести фронтенду.
+
+3. **test_backend**:
+
+   - Використовується образ `node:22`.
+   - Для тестування використовується сервіс `mysql:8`.
+   - Перед виконанням скриптів встановлюються залежності бекенду та остання версія npm.
+   - Скрипти запускають тести бекенду.
+
+4. **deploy**:
+   - Використовується образ `docker:latest`.
+   - Перед виконанням скриптів встановлюється `docker-compose`.
+   - Скрипти запускають контейнери у фоновому режимі.
 
 ## Автори
 
