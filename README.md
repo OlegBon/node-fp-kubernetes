@@ -152,6 +152,7 @@ node-fp-kubernetes/
 │   ├── Dockerfile
 │   ├── jest.config.js
 │   └── package.json
+│
 ├── .gitignore
 ├── .gitlab-ci.yml
 ├── docker-compose.yml
