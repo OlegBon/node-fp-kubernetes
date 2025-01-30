@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: database
+  namespace: node-fp-kubernetes
+spec:
+  selector:
+    app: database
+  ports:
+    - protocol: TCP
+      port: 3307
+      targetPort: 3307
+  type: ClusterIP
