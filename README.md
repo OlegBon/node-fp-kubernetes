@@ -81,7 +81,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 ## Файлова структура
 
 ```text
-app-docker-compose/
+node-fp-kubernetes/
 │
 ├── backend/
 │   ├── config/
