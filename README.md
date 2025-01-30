@@ -81,7 +81,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 ## Файлова структура
 
 ```text
-cbs-node-final-project/
+app-docker-compose/
 │
 ├── backend/
 │   ├── config/
