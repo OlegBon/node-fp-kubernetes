@@ -17,4 +17,4 @@ spec:
         - name: database
           image: olegbon/node-fp-database:latest
           ports:
-            - containerPort: 3307
+            - containerPort: 3306
